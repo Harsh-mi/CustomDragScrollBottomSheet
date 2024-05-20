@@ -129,7 +129,7 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
                     toggleLayout()
                     isHorizontalLayout = false
                 }
-            } else if newY > halfHeight {
+            } else if newY > halfHeight - 50 {
                 targetY = view.frame.maxY - minHeight
                 isFullHeight = false
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
