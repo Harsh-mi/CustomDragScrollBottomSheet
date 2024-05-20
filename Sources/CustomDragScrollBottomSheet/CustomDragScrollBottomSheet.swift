@@ -49,7 +49,7 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
         configUI()
     }
     
-    var selectedBottomSheetData: ((BottomSheetDataModel) -> Void)?
+    public var selectedBottomSheetData: ((BottomSheetDataModel) -> Void)?
     
     private func configUI() {
                 
