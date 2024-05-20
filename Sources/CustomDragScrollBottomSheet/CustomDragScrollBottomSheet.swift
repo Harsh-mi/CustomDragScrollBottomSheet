@@ -17,7 +17,7 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
     
     public var arrayPostOptions: [DropDownDataModel] = []
         
-    public var isHeightChanged: Bool = true
+    public var isHeightChanged: Bool = false
     public var isFullHeight: Bool = false
     
     public let fullHeight: CGFloat = UIScreen.main.bounds.height - 120
@@ -134,7 +134,7 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
                 isFullHeight = false
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
                     guard let self = self else {return}
-//                    isHeightChanged = true
+                    isHeightChanged = true
                     toggleLayout()
                     isHorizontalLayout = true
                 }
@@ -143,7 +143,7 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
                 isFullHeight = true
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
                     guard let self = self else {return}
-//                    isHeightChanged = true
+                    isHeightChanged = true
                     toggleLayout()
                     isHorizontalLayout = false
                 }
