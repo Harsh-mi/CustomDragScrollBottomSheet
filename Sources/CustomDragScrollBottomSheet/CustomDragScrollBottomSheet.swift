@@ -20,7 +20,7 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
     public var isHeightChanged: Bool = false
     public var isFullHeight: Bool = false
     
-    public let fullHeight: CGFloat = UIScreen.main.bounds.height - 120
+    public let fullHeight: CGFloat = UIScreen.main.bounds.height
     public let halfHeight: CGFloat = UIScreen.main.bounds.height / 2
     public let minHeight: CGFloat = 100
     
@@ -152,7 +152,7 @@ extension CustomDragScrollBottomSheetVC {
                     toggleLayout()
                     isHorizontalLayout = true
                 }
-            } else if newY < halfHeight {
+            } else if newY < halfHeight - 50 {
                 targetY = view.frame.maxY - fullHeight
                 isFullHeight = true
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
