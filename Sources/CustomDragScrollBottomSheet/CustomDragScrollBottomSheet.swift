@@ -54,7 +54,7 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
     private func configUI() {
                 
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
-        bottomSheetView.frame = CGRect(x: 0, y: view.frame.maxY - halfHeight - 50, width: view.frame.width, height: fullHeight)
+        bottomSheetView.frame = CGRect(x: 0, y: view.frame.maxY - halfHeight, width: view.frame.width, height: fullHeight)
         bottomSheetView.layer.shadowColor = UIColor.gray.cgColor
         bottomSheetView.layer.shadowOpacity = 1
         bottomSheetView.layer.shadowOffset = CGSize(width: 0, height: 5)
@@ -143,7 +143,7 @@ extension CustomDragScrollBottomSheetVC {
                     toggleLayout()
                     isHorizontalLayout = false
                 }
-            } else if newY > halfHeight - 30 {
+            } else if newY > halfHeight - 40 {
                 targetY = view.frame.maxY - minHeight
                 isFullHeight = false
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
