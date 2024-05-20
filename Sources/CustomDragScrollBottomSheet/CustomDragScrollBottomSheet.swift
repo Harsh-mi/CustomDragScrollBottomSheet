@@ -17,7 +17,7 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
     
     public var arrayPostOptions: [DropDownDataModel] = []
         
-    public var isHeightChanged: Bool = false
+    public var isHeightChanged: Bool = true
     public var isFullHeight: Bool = false
     
     public let fullHeight: CGFloat = UIScreen.main.bounds.height - 120
@@ -25,7 +25,6 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
     public let minHeight: CGFloat = 100
     
     public var isHorizontalLayout = false
-    public var transperantView = UIView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
     public var panGesture: UIPanGestureRecognizer!
     public var collectionViewPostOptions: UICollectionView!
     
@@ -59,16 +58,13 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
         bottomSheetView.layer.shadowRadius = 10
         bottomSheetView.layer.shadowPath = UIBezierPath(rect: bottomSheetView.bounds).cgPath
         bottomSheetView.addGestureRecognizer(panGesture)
-        view.addSubview(transperantView)
         view.addSubview(bottomSheetView)
         
         dragIconView.frame = CGRect(x: bottomSheetView.center.x - 20, y: 10, width: 40, height: 5)
         
         configCollectionView()
         bottomSheetView.addSubview(dragIconView)
-        
-        transperantView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.5)
-        transperantView.isHidden = true
+
         bottomSheetView.addSubview(collectionViewPostOptions)
     }
         
@@ -138,7 +134,7 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
                 isFullHeight = false
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
                     guard let self = self else {return}
-                    isHeightChanged = true
+//                    isHeightChanged = true
                     toggleLayout()
                     isHorizontalLayout = true
                 }
@@ -147,12 +143,11 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
                 isFullHeight = true
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
                     guard let self = self else {return}
-                    isHeightChanged = true
+//                    isHeightChanged = true
                     toggleLayout()
                     isHorizontalLayout = false
                 }
             }
-            transperantView.isHidden = isFullHeight ? false : true
             // Animate to the target position
             UIView.animate(withDuration: 0.3) {
                 self.bottomSheetView.frame.origin.y = targetY
