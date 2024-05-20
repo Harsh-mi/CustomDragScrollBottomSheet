@@ -3,7 +3,7 @@
 
 import UIKit
 
-public struct DropDownDataModel {
+public struct BottomSheetDataModel {
     public var image: String
     public var data: String
     
@@ -15,7 +15,7 @@ public struct DropDownDataModel {
 
 public class CustomDragScrollBottomSheetVC: UIViewController {
     
-    public var arrayPostOptions: [DropDownDataModel] = []
+    public var arrayBottomSheetData: [BottomSheetDataModel] = []
         
     public var isHeightChanged: Bool = false
     public var isFullHeight: Bool = false
@@ -49,10 +49,12 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
         configUI()
     }
     
+    var selectedBottomSheetData: ((BottomSheetDataModel) -> Void)?
+    
     private func configUI() {
                 
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
-        bottomSheetView.frame = CGRect(x: 0, y: view.frame.maxY - halfHeight + 50, width: view.frame.width, height: fullHeight)
+        bottomSheetView.frame = CGRect(x: 0, y: view.frame.maxY - halfHeight - 50, width: view.frame.width, height: fullHeight)
         bottomSheetView.layer.shadowColor = UIColor.gray.cgColor
         bottomSheetView.layer.shadowOpacity = 1
         bottomSheetView.layer.shadowOffset = CGSize(width: 0, height: 5)
@@ -175,24 +177,25 @@ extension CustomDragScrollBottomSheetVC {
 extension CustomDragScrollBottomSheetVC: UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     
     public func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return arrayPostOptions.count
+        return arrayBottomSheetData.count
     }
     
     public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PostOptionsCell", for: indexPath) as? PostOptionsCell
         DispatchQueue.main.async { [weak self] in
             guard let self = self else {return}
-            if arrayPostOptions[indexPath.item].image == "" {
+            if arrayBottomSheetData[indexPath.item].image == "" {
                 cell?.imageIcon.image = UIImage(named: "ic_placeholder", in: .module, with: .none)
             } else {
-                cell?.imageIcon.image = UIImage(named: arrayPostOptions[indexPath.item].image)
+                cell?.imageIcon.image = UIImage(named: arrayBottomSheetData[indexPath.item].image)
             }
-            cell?.labelPostOption.text = isHorizontalLayout ? "" : arrayPostOptions[indexPath.item].data
+            cell?.labelPostOption.text = isHorizontalLayout ? "" : arrayBottomSheetData[indexPath.item].data
         }
         return cell ?? UICollectionViewCell()
     }
     
     public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        selectedBottomSheetData?(arrayBottomSheetData[indexPath.item])
         self.dismiss(animated: true)
     }
     
