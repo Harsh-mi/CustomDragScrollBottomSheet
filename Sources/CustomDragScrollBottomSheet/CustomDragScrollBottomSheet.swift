@@ -25,6 +25,7 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
     public let minHeight: CGFloat = 100
     
     public var isHorizontalLayout = false
+    public var transperantView = UIView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
     public var panGesture: UIPanGestureRecognizer!
     public var collectionViewPostOptions: UICollectionView!
     
@@ -51,20 +52,23 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
     private func configUI() {
                 
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
-        bottomSheetView.frame = CGRect(x: 0, y: view.frame.maxY - halfHeight, width: view.frame.width, height: fullHeight)
+        bottomSheetView.frame = CGRect(x: 0, y: view.frame.maxY - halfHeight + 50, width: view.frame.width, height: fullHeight)
         bottomSheetView.layer.shadowColor = UIColor.gray.cgColor
         bottomSheetView.layer.shadowOpacity = 1
         bottomSheetView.layer.shadowOffset = CGSize(width: 0, height: 5)
         bottomSheetView.layer.shadowRadius = 10
         bottomSheetView.layer.shadowPath = UIBezierPath(rect: bottomSheetView.bounds).cgPath
         bottomSheetView.addGestureRecognizer(panGesture)
+        view.addSubview(transperantView)
         view.addSubview(bottomSheetView)
         
         dragIconView.frame = CGRect(x: bottomSheetView.center.x - 20, y: 10, width: 40, height: 5)
         
         configCollectionView()
         bottomSheetView.addSubview(dragIconView)
-
+        
+        transperantView.backgroundColor = .clear
+        transperantView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTapGesture(_:))))
         bottomSheetView.addSubview(collectionViewPostOptions)
     }
         
@@ -100,6 +104,14 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
             }
         }
     }
+}
+
+//MARK: - Gesture actions -
+extension CustomDragScrollBottomSheetVC {
+    
+    @objc func handleTapGesture(_ recognizer: UITapGestureRecognizer) {
+        self.dismiss(animated: true)
+    }
     
     @objc func handlePanGesture(_ recognizer: UIPanGestureRecognizer) {
         
@@ -129,7 +141,7 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
                     toggleLayout()
                     isHorizontalLayout = false
                 }
-            } else if newY > halfHeight - 50 {
+            } else if newY > halfHeight - 30 {
                 targetY = view.frame.maxY - minHeight
                 isFullHeight = false
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
@@ -178,6 +190,10 @@ extension CustomDragScrollBottomSheetVC: UICollectionViewDataSource, UICollectio
             cell?.labelPostOption.text = isHorizontalLayout ? "" : arrayPostOptions[indexPath.item].data
         }
         return cell ?? UICollectionViewCell()
+    }
+    
+    public func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        self.dismiss(animated: true)
     }
     
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
