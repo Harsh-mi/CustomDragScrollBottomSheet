@@ -143,7 +143,7 @@ extension CustomDragScrollBottomSheetVC {
                     toggleLayout()
                     isHorizontalLayout = false
                 }
-            } else if newY > halfHeight - 40 {
+            } else if newY > halfHeight - 50 {
                 targetY = view.frame.maxY - minHeight
                 isFullHeight = false
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
