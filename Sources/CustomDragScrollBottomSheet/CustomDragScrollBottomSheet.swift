@@ -167,9 +167,11 @@ extension CustomDragScrollBottomSheetVC {
         switch state {
         case .full:
             isHorizontalLayout = false
+            isFullHeight = true
             targetY = view.frame.height - fullHeight
         case .half:
             isHorizontalLayout = false
+            isFullHeight = false
             targetY = view.frame.height - halfHeight
         case .minimum:
             isHorizontalLayout = true
