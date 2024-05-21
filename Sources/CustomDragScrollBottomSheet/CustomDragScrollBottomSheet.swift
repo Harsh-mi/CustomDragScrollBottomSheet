@@ -107,14 +107,13 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
             let layout = UICollectionViewFlowLayout()
             layout.scrollDirection = isHorizontalLayout ? .horizontal : .vertical
             collectionViewPostOptions.setCollectionViewLayout(layout, animated: false)
-            
-            collectionViewPostOptions.contentInset.bottom = isFullHeight ? 0 : 10
-            
+                        
             collectionViewPostOptions.reloadData()
             if isHorizontalLayout {
                 collectionViewPostOptions.frame.size.height = 50
             } else {
                 collectionViewPostOptions.frame.size.height = isFullHeight ? fullHeight - 40 : (UIScreen.main.bounds.height / 2 - 30)
+                collectionViewPostOptions.contentInset.bottom = isFullHeight ? 0 : 10
             }
         }
     }
