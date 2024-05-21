@@ -62,7 +62,7 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
     func configBottomSheet() {
         
         bottomSheetPanGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
-        bottomSheetView.frame = CGRect(x: 0, y: view.frame.midY - 70, width: view.frame.width, height: fullHeight)
+        bottomSheetView.frame = CGRect(x: 0, y: view.frame.midY - 50, width: view.frame.width, height: fullHeight)
         bottomSheetView.backgroundColor = .white
         bottomSheetView.layer.cornerRadius = 10
         bottomSheetView.layer.shadowColor = UIColor.gray.cgColor
@@ -89,7 +89,7 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         
-        collectionViewPostOptions = UICollectionView(frame: CGRect(x: 0, y: 30, width: view.frame.width, height: halfHeight), collectionViewLayout: layout)
+        collectionViewPostOptions = UICollectionView(frame: CGRect(x: 0, y: 30, width: view.frame.width, height: halfHeight + 30), collectionViewLayout: layout)
         collectionViewPostOptions.contentInset.bottom = isHorizontalLayout ? 0 : (isFullHeight ? 0 : 40)
         collectionViewPostOptions.translatesAutoresizingMaskIntoConstraints = false
         collectionViewPostOptions.showsHorizontalScrollIndicator = false
@@ -114,7 +114,8 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
                 collectionViewPostOptions.frame.size.height = 50
                 collectionViewPostOptions.contentInset.bottom = 0
             } else {
-                collectionViewPostOptions.frame.size.height = isFullHeight ? fullHeight - 40 : (UIScreen.main.bounds.height / 2 - 30)
+                collectionViewPostOptions.frame.size.height = isFullHeight ? fullHeight - 40 : (halfHeight - 30)
+                collectionViewPostOptions.contentInset.bottom = isFullHeight ? 0 : 10
             }
         }
     }
