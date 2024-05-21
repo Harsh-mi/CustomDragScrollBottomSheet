@@ -40,6 +40,8 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
     public var bottomSheetView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
+        view.clipsToBounds = true
+        view.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner]
         view.layer.cornerRadius = 16
         return view
     }()
