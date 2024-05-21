@@ -144,6 +144,7 @@ extension CustomDragScrollBottomSheetVC {
                     targetState = .half
                 } else {
                     targetState = .minimum
+                    isHorizontalLayout = true
                 }
                 toggleLayout()
             } else {
@@ -153,6 +154,7 @@ extension CustomDragScrollBottomSheetVC {
                 } else {
                     targetState = .full
                 }
+                isHorizontalLayout = false
                 toggleLayout()
             }
 
