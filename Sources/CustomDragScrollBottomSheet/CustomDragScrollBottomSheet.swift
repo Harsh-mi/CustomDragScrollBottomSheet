@@ -89,7 +89,7 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         
-        collectionViewPostOptions = UICollectionView(frame: CGRect(x: 0, y: 30, width: view.frame.width, height: (UIScreen.main.bounds.height / 2 - 40)), collectionViewLayout: layout)
+        collectionViewPostOptions = UICollectionView(frame: CGRect(x: 0, y: 30, width: view.frame.width, height: bottomSheetView.frame.height), collectionViewLayout: layout)
         collectionViewPostOptions.translatesAutoresizingMaskIntoConstraints = false
         collectionViewPostOptions.showsHorizontalScrollIndicator = false
         collectionViewPostOptions.showsVerticalScrollIndicator = false
