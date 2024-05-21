@@ -15,18 +15,26 @@ public struct BottomSheetDataModel {
 
 public class CustomDragScrollBottomSheetVC: UIViewController {
     
+    public enum BottomSheetState {
+        case full
+        case half
+        case minimum
+    }
+    
     public var arrayBottomSheetData: [BottomSheetDataModel] = []
         
     public var isHeightChanged: Bool = false
     public var isFullHeight: Bool = false
     
-    public let fullHeight: CGFloat = UIScreen.main.bounds.height - 120
-    public let halfHeight: CGFloat = UIScreen.main.bounds.height / 2
-    public let minHeight: CGFloat = 100
+    let fullHeight: CGFloat = UIScreen.main.bounds.height * 0.9 // Example height, adjust as needed
+    let halfHeight: CGFloat = UIScreen.main.bounds.height * 0.5 // Example height, adjust as needed
+    let minimumHeight: CGFloat = UIScreen.main.bounds.height * 0.1 // Example height, adjust as needed
+
+    public var currentState: BottomSheetState = .full
     
     public var isHorizontalLayout = false
     public var transperantView = UIView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
-    public var panGesture: UIPanGestureRecognizer!
+    public var bottomSheetPanGesture: UIPanGestureRecognizer!
     public var collectionViewPostOptions: UICollectionView!
     
     public var bottomSheetView: UIView = {
@@ -46,21 +54,26 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
     
     public override func viewDidLoad() {
         super.viewDidLoad()
-        configUI()
+        configBottomSheet()
     }
     
     public var selectedBottomSheetData: ((BottomSheetDataModel) -> Void)?
     
-    private func configUI() {
-                
-        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
-        bottomSheetView.frame = CGRect(x: 0, y: view.frame.maxY - halfHeight, width: view.frame.width, height: fullHeight)
+    func configBottomSheet() {
+        
+        bottomSheetPanGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
+        bottomSheetView.frame = CGRect(x: 0, y: halfHeight, width: view.frame.width, height: fullHeight)
+        bottomSheetView.backgroundColor = .white
+        bottomSheetView.layer.cornerRadius = 10
         bottomSheetView.layer.shadowColor = UIColor.gray.cgColor
         bottomSheetView.layer.shadowOpacity = 1
         bottomSheetView.layer.shadowOffset = CGSize(width: 0, height: 5)
         bottomSheetView.layer.shadowRadius = 10
         bottomSheetView.layer.shadowPath = UIBezierPath(rect: bottomSheetView.bounds).cgPath
-        bottomSheetView.addGestureRecognizer(panGesture)
+        bottomSheetView.addGestureRecognizer(bottomSheetPanGesture)
+        
+        transperantView.backgroundColor = .clear
+        transperantView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTapGesture(_:))))
         view.addSubview(transperantView)
         view.addSubview(bottomSheetView)
         
@@ -68,12 +81,9 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
         
         configCollectionView()
         bottomSheetView.addSubview(dragIconView)
-        
-        transperantView.backgroundColor = .clear
-        transperantView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTapGesture(_:))))
         bottomSheetView.addSubview(collectionViewPostOptions)
     }
-        
+
     func configCollectionView() {
         
         let layout = UICollectionViewFlowLayout()
@@ -116,59 +126,57 @@ extension CustomDragScrollBottomSheetVC {
     }
     
     @objc func handlePanGesture(_ recognizer: UIPanGestureRecognizer) {
-        
         let translation = recognizer.translation(in: view)
-        var newY: CGFloat = 0
-        var targetY: CGFloat = 0
-        
+        let velocity = recognizer.velocity(in: view)
+        let y = bottomSheetView.frame.minY + translation.y
+
         switch recognizer.state {
         case .changed:
-            // Update the position of the bottom sheet based on the gesture's translation
-            if isHeightChanged {
-                newY = 0
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-                    guard let self = self else {return}
-                    isHeightChanged = false
+            if y >= view.frame.height - fullHeight && y <= view.frame.height - minimumHeight {
+                bottomSheetView.frame.origin.y = y
+                recognizer.setTranslation(.zero, in: view)
+            }
+        case .ended:
+            let targetState: BottomSheetState
+            if velocity.y > 0 {
+                // Moving downward
+                if currentState == .full {
+                    targetState = .half
+                } else {
+                    targetState = .minimum
                 }
+                toggleLayout()
             } else {
-                newY = bottomSheetView.frame.minY + translation.y
-                newY = min(max(newY, view.frame.maxY - fullHeight), view.frame.maxY - minHeight)
+                // Moving upward
+                if currentState == .minimum {
+                    targetState = .half
+                } else {
+                    targetState = .full
+                }
+                toggleLayout()
             }
 
-            if newY == 0 {
-                isFullHeight = false
-                targetY = view.frame.maxY - halfHeight
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-                    guard let self = self else {return}
-                    toggleLayout()
-                    isHorizontalLayout = false
-                }
-            } else if newY > halfHeight - 50 {
-                targetY = view.frame.maxY - minHeight
-                isFullHeight = false
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-                    guard let self = self else {return}
-                    isHeightChanged = true
-                    toggleLayout()
-                    isHorizontalLayout = true
-                }
-            } else if newY < halfHeight {
-                targetY = view.frame.maxY - fullHeight
-                isFullHeight = true
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-                    guard let self = self else {return}
-                    isHeightChanged = true
-                    toggleLayout()
-                    isHorizontalLayout = false
-                }
-            }
-            // Animate to the target position
-            UIView.animate(withDuration: 0.3) {
-                self.bottomSheetView.frame.origin.y = targetY
-            }
-
+            animateBottomSheet(to: targetState)
         default:
             break
+        }
+    }
+
+    func animateBottomSheet(to state: BottomSheetState) {
+        let targetY: CGFloat
+        switch state {
+        case .full:
+            targetY = view.frame.height - fullHeight
+        case .half:
+            targetY = view.frame.height - halfHeight
+        case .minimum:
+            targetY = view.frame.height - minimumHeight
+        }
+
+        UIView.animate(withDuration: 0.3, animations: {
+            self.bottomSheetView.frame.origin.y = targetY
+        }) { _ in
+            self.currentState = state
         }
     }
 }
@@ -217,3 +225,139 @@ extension CustomDragScrollBottomSheetVC: UICollectionViewDataSource, UICollectio
     }
 }
 
+
+//class ViewController: UIViewController {
+//
+//    public enum BottomSheetState {
+//        case full
+//        case half
+//        case minimum
+//    }
+//
+//    let bottomSheetView = UIView()
+//    let fullHeight: CGFloat = UIScreen.main.bounds.height * 0.9 // Example height, adjust as needed
+//    let halfHeight: CGFloat = UIScreen.main.bounds.height * 0.5 // Example height, adjust as needed
+//    let minimumHeight: CGFloat = UIScreen.main.bounds.height * 0.1 // Example height, adjust as needed
+//
+//    public var bottomSheetPanGesture: UIPanGestureRecognizer!
+//    public var currentState: BottomSheetState = .full
+//    public var transperantView = UIView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
+//    public var collectionViewPostOptions: UICollectionView!
+//    
+//    public var dragIconView: UIView = {
+//        let view = UIView()
+//        view.backgroundColor = .lightGray
+//        view.layer.cornerRadius = 5
+//        view.layer.shadowColor = UIColor.black.cgColor
+//        return view
+//    }()
+//
+//    override func viewDidLoad() {
+//        super.viewDidLoad()
+//
+//        setupBottomSheet()
+//        addPanGesture()
+//    }
+//
+//    func setupBottomSheet() {
+//        
+//        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
+//        bottomSheetView.frame = CGRect(x: 0, y: halfHeight, width: view.frame.width, height: fullHeight)
+//        bottomSheetView.backgroundColor = .white
+//        bottomSheetView.layer.cornerRadius = 10
+//        bottomSheetView.layer.shadowColor = UIColor.gray.cgColor
+//        bottomSheetView.layer.shadowOpacity = 1
+//        bottomSheetView.layer.shadowOffset = CGSize(width: 0, height: 5)
+//        bottomSheetView.layer.shadowRadius = 10
+//        bottomSheetView.layer.shadowPath = UIBezierPath(rect: bottomSheetView.bounds).cgPath
+//        bottomSheetView.addGestureRecognizer(panGesture)
+//        
+//        transperantView.backgroundColor = .clear
+//        transperantView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(handleTapGesture(_:))))
+//        view.addSubview(transperantView)
+//        view.addSubview(bottomSheetView)
+//        
+//        dragIconView.frame = CGRect(x: bottomSheetView.center.x - 20, y: 10, width: 40, height: 5)
+//        
+//        configCollectionView()
+//        bottomSheetView.addSubview(dragIconView)
+//    }
+//    
+//    func configCollectionView() {
+//        
+//        let layout = UICollectionViewFlowLayout()
+//        layout.scrollDirection = .vertical
+//        
+//        collectionViewPostOptions = UICollectionView(frame: CGRect(x: 0, y: 30, width: view.frame.width, height: (UIScreen.main.bounds.height / 2 - 40)), collectionViewLayout: layout)
+//        collectionViewPostOptions.translatesAutoresizingMaskIntoConstraints = false
+//        collectionViewPostOptions.showsHorizontalScrollIndicator = false
+//        collectionViewPostOptions.showsVerticalScrollIndicator = false
+////        collectionViewPostOptions.delegate = self
+////        collectionViewPostOptions.dataSource = self
+//        
+////        let nib = UINib(nibName: "PostOptionsCell", bundle: .module)
+////        collectionViewPostOptions.register(nib, forCellWithReuseIdentifier: "PostOptionsCell")
+//    }
+//
+//    func addPanGesture() {
+//        bottomSheetPanGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
+//        bottomSheetView.addGestureRecognizer(bottomSheetPanGesture)
+//    }
+//    
+//    @objc func handleTapGesture(_ recognizer: UITapGestureRecognizer) {
+//        self.dismiss(animated: true)
+//    }
+//
+//    @objc func handlePanGesture(_ recognizer: UIPanGestureRecognizer) {
+//        let translation = recognizer.translation(in: view)
+//        let velocity = recognizer.velocity(in: view)
+//        let y = bottomSheetView.frame.minY + translation.y
+//
+//        switch recognizer.state {
+//        case .changed:
+//            if y >= view.frame.height - fullHeight && y <= view.frame.height - minimumHeight {
+//                bottomSheetView.frame.origin.y = y
+//                recognizer.setTranslation(.zero, in: view)
+//            }
+//        case .ended:
+//            let targetState: BottomSheetState
+//            if velocity.y > 0 {
+//                // Moving downward
+//                if currentState == .full {
+//                    targetState = .half
+//                } else {
+//                    targetState = .minimum
+//                }
+//            } else {
+//                // Moving upward
+//                if currentState == .minimum {
+//                    targetState = .half
+//                } else {
+//                    targetState = .full
+//                }
+//            }
+//
+//            animateBottomSheet(to: targetState)
+//        default:
+//            break
+//        }
+//    }
+//
+//    func animateBottomSheet(to state: BottomSheetState) {
+//        let targetY: CGFloat
+//        switch state {
+//        case .full:
+//            targetY = view.frame.height - fullHeight
+//        case .half:
+//            targetY = view.frame.height - halfHeight
+//        case .minimum:
+//            targetY = view.frame.height - minimumHeight
+//        }
+//
+//        UIView.animate(withDuration: 0.3, animations: {
+//            self.bottomSheetView.frame.origin.y = targetY
+//        }) { _ in
+//            self.currentState = state
+//        }
+//    }
+//}
