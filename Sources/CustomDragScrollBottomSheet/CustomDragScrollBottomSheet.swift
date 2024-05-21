@@ -124,16 +124,19 @@ extension CustomDragScrollBottomSheetVC {
         switch recognizer.state {
         case .changed:
             // Update the position of the bottom sheet based on the gesture's translation
-            if isHeightChanged {
-                newY = 0
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-                    guard let self = self else {return}
-                    isHeightChanged = false
-                }
-            } else {
-                newY = bottomSheetView.frame.minY + translation.y
-                newY = min(max(newY, view.frame.maxY - fullHeight), view.frame.maxY - minHeight)
-            }
+//            if isHeightChanged {
+//                newY = 0
+//                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+//                    guard let self = self else {return}
+//                    isHeightChanged = false
+//                }
+//            } else {
+//                newY = bottomSheetView.frame.minY + translation.y
+//                newY = min(max(newY, view.frame.maxY - fullHeight), view.frame.maxY - minHeight)
+//            }
+            newY = 0
+            newY = bottomSheetView.frame.minY + translation.y
+            newY = min(max(newY, view.frame.maxY - fullHeight), view.frame.maxY - minHeight)
 
             if newY == 0 {
                 isFullHeight = false
