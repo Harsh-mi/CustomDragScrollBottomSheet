@@ -62,7 +62,7 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
     func configBottomSheet() {
         
         bottomSheetPanGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
-        bottomSheetView.frame = CGRect(x: 0, y: halfHeight, width: view.frame.width, height: halfHeight + 10)
+        bottomSheetView.frame = CGRect(x: 0, y: halfHeight, width: view.frame.width, height: fullHeight)
         bottomSheetView.backgroundColor = .white
         bottomSheetView.layer.cornerRadius = 10
         bottomSheetView.layer.shadowColor = UIColor.gray.cgColor
@@ -90,6 +90,7 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
         layout.scrollDirection = .vertical
         
         collectionViewPostOptions = UICollectionView(frame: CGRect(x: 0, y: 30, width: view.frame.width, height: bottomSheetView.frame.height), collectionViewLayout: layout)
+        collectionViewPostOptions.contentInset.bottom = isHorizontalLayout ? 0 : (isFullHeight ? 0 : 20)
         collectionViewPostOptions.translatesAutoresizingMaskIntoConstraints = false
         collectionViewPostOptions.showsHorizontalScrollIndicator = false
         collectionViewPostOptions.showsVerticalScrollIndicator = false
@@ -114,7 +115,6 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
                 collectionViewPostOptions.contentInset.bottom = 0
             } else {
                 collectionViewPostOptions.frame.size.height = isFullHeight ? fullHeight - 40 : (UIScreen.main.bounds.height / 2 - 30)
-                collectionViewPostOptions.contentInset.bottom = isFullHeight ? 0 : 10
             }
         }
     }
@@ -217,7 +217,7 @@ extension CustomDragScrollBottomSheetVC: UICollectionViewDataSource, UICollectio
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
 
         if isHorizontalLayout {
-            return CGSize(width: 75, height: 75)
+            return CGSize(width: 75, height: 70)
         } else {
             return CGSize(width: collectionView.bounds.width, height: 50)
         }
