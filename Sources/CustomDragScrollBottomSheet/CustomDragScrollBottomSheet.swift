@@ -30,7 +30,7 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
     public var halfHeight: CGFloat = UIScreen.main.bounds.height * 0.5 // Example height, adjust as needed
     public var minimumHeight: CGFloat = UIScreen.main.bounds.height * 0.1 // Example height, adjust as needed
 
-    public var currentState: BottomSheetState = .full
+    public var currentState: BottomSheetState = .half
     
     public var isHorizontalLayout = false
     public var transperantView = UIView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
@@ -62,7 +62,7 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
     func configBottomSheet() {
         
         bottomSheetPanGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
-        bottomSheetView.frame = CGRect(x: 0, y: halfHeight, width: view.frame.width, height: fullHeight)
+        bottomSheetView.frame = CGRect(x: 0, y: view.frame.height / 2, width: view.frame.width, height: fullHeight)
         bottomSheetView.backgroundColor = .white
         bottomSheetView.layer.cornerRadius = 10
         bottomSheetView.layer.shadowColor = UIColor.gray.cgColor
@@ -107,6 +107,8 @@ public class CustomDragScrollBottomSheetVC: UIViewController {
             let layout = UICollectionViewFlowLayout()
             layout.scrollDirection = isHorizontalLayout ? .horizontal : .vertical
             collectionViewPostOptions.setCollectionViewLayout(layout, animated: false)
+            
+            collectionViewPostOptions.contentInset.bottom = isFullHeight ? 0 : 10
             
             collectionViewPostOptions.reloadData()
             if isHorizontalLayout {
