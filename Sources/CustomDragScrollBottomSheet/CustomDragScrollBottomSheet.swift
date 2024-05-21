@@ -213,7 +213,7 @@ extension CustomDragScrollBottomSheetVC: UICollectionViewDataSource, UICollectio
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
 
         if isHorizontalLayout {
-            return CGSize(width: 75, height: 50)
+            return CGSize(width: 75, height: collectionView.bounds.height)
         } else {
             return CGSize(width: collectionView.bounds.width, height: 50)
         }
