@@ -144,7 +144,6 @@ extension CustomDragScrollBottomSheetVC {
                     targetState = .half
                 } else {
                     targetState = .minimum
-                    isHorizontalLayout = true
                 }
                 toggleLayout()
             } else {
@@ -154,7 +153,6 @@ extension CustomDragScrollBottomSheetVC {
                 } else {
                     targetState = .full
                 }
-                isHorizontalLayout = false
                 toggleLayout()
             }
 
@@ -168,10 +166,13 @@ extension CustomDragScrollBottomSheetVC {
         let targetY: CGFloat
         switch state {
         case .full:
+            isHorizontalLayout = false
             targetY = view.frame.height - fullHeight
         case .half:
+            isHorizontalLayout = false
             targetY = view.frame.height - halfHeight
         case .minimum:
+            isHorizontalLayout = true
             targetY = view.frame.height - minimumHeight
         }
 
@@ -212,7 +213,7 @@ extension CustomDragScrollBottomSheetVC: UICollectionViewDataSource, UICollectio
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
 
         if isHorizontalLayout {
-            return CGSize(width: 75, height: collectionView.bounds.height)
+            return CGSize(width: 75, height: 50)
         } else {
             return CGSize(width: collectionView.bounds.width, height: 50)
         }
